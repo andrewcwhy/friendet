@@ -1,6 +1,6 @@
 import { createServerFileRoute } from '@tanstack/solid-start/server'
 import { json } from '@tanstack/solid-start'
-import type { User } from '~/utils/users'
+import type { User } from ':utils/users'
 
 export const ServerRoute = createServerFileRoute('/api/users/$userId').methods({
   GET: async ({ params, request }) => {

@@ -1,7 +1,6 @@
 {
   "name": "web",
   "private": true,
-  "sideEffects": false,
   "type": "module",
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
@@ -10,10 +9,9 @@
     "@tanstack/solid-start": "^1.122.0",
     "redaxios": "^0.5.1",
     "solid-js": "catalog:",
-    "tailwind-merge": "^2.6.0"
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.17",
     "vite": "catalog:build",
     "vite-tsconfig-paths": "catalog:plugins"
   }

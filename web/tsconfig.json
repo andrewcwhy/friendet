@@ -18,5 +18,4 @@
     ]
   },
   "extends": "../tsconfig.options.json",
-  "includes": "src/**/*",
 }

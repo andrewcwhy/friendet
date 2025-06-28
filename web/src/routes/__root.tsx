@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import {
   HeadContent,
   Link,
@@ -7,10 +6,10 @@ import {
 } from '@tanstack/solid-router'
 import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 import type * as Solid from 'solid-js'
-import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
-import { NotFound } from '~/components/NotFound'
-import appCss from '~/styles/app.css?url'
-import { seo } from '~/utils/seo'
+import { DefaultCatchBoundary } from ':components/DefaultCatchBoundary'
+import { NotFound } from ':components/NotFound'
+import appCss from ':styles/index.css'
+import { seo } from ':utils/seo'
 
 export const Route = createRootRoute({
   head: () => ({
