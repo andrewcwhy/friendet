@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "noEmit": true,
+    "paths": {
+      ":*": [
+        "./src/*"
+      ],
+    },
+    "types": [
+      "vite/client"
+    ]
+  },
+  "extends": "../tsconfig.options.json",
+  "includes": "src/**/*",
+}

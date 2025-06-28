@@ -1,0 +1,30 @@
+{
+    "name": "",
+    "description": "",
+    "private": "true",
+    "devDependencies": {
+        "@biomejs/biome": "2.0.6",
+        "@moonrepo/cli": "^1.38.0",
+        "@types/bun": "^1.2.17",
+        "typescript": "^5.8.3"
+    },
+    "trustedDependencies": [
+        "@moonrepo/cli"
+    ],
+    "workspaces": {
+        "packages": [
+            "web"
+        ],
+        "catalog": {
+            "solid-js": "^1.9.5"
+        },
+        "catalogs": {
+            "build": {
+                "vite": "^7.0.0"
+            },
+            "plugins": {
+                "vite-tsconfig-paths": "^5.1.4"
+            }
+        }
+    }
+}
