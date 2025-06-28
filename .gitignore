@@ -1,11 +1,28 @@
-# Artifacts
-*.tsbuildinfo
+dist
+.wrangler
+.output
+.vercel
+.netlify
+.vinxi
+app.config.timestamp_*.js
 
-# Build output
-dist/
+# Environment
+.env
+.env*.local
 
-# Dependencies
-node_modules/
+# dependencies
+/node_modules
 
-# moon
-.moon/cache
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+
+# Temp
+gitignore
+
+# System Files
+.DS_Store
+Thumbs.db

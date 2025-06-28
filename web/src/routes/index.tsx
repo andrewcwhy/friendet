@@ -1,12 +1,16 @@
-import { createFileRoute } from '@tanstack/solid-router'
-export const Route = createFileRoute('/')({
-  component: Home,
-})
+import { createFileRoute } from "@tanstack/solid-router";
 
-function Home() {
-  return (
-    <div class="p-2">
-      <h3>Welcome Home!!!</h3>
-    </div>
-  )
+export const Route = createFileRoute("/")({
+	component: Index,
+});
+
+function Index() {
+	return (
+		<main>
+			<header>
+				<h1>Friendet</h1>
+				<p>Welcome to Friendet. </p>
+			</header>
+		</main>
+	);
 }

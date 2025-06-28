@@ -4,5 +4,24 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 type: application
 
-tags:
-  - vite
+tasks:
+  build:
+    command: vinxi dev
+    outputs:
+      - .output
+      - .vinxi
+
+  dev:
+    command: vinxi dev
+    outputs:
+      - .tanstack
+    preset: server
+
+  start:
+    command: vinxi dev
+    inputs:
+      - .output
+    preset: server
+
+  version:
+    command: vinxi version

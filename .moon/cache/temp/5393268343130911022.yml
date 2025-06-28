@@ -1,0 +1,23 @@
+# https://moonrepo.dev/docs/config/tasks
+$schema: https://moonrepo.dev/schemas/tasks.json
+
+fileGroups:
+  configs:
+    - "*.config.{js,ts}"
+    - "*.{json,jsonc}"
+  tests:
+    - tests/**/*
+    - "*.test.{js,jsx,ts,tsx}"
+
+tasks:
+  check:
+    description: Checks the codebase for errors.
+    command: biome check --write .
+
+  format:
+    description: Formats the codebase.
+    command: biome format --write .
+
+  lint:
+    description: Lints the codebase.
+    command: biome lint --write .

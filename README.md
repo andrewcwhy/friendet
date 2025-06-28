@@ -4,11 +4,9 @@ Below is the core technology stack used, along with links to their documentation
 
 - [Bun](https://bun.sh/docs) - Fast JavaScript runtime and package manager
 - [Moon](https://moonrepo.dev/docs/install) - Monorepo management, organization, orchestration, and notification tool for the web ecosystem
-- [Solid](https://docs.solidjs.com/quick-start) - UI library
 - [Tailwind CSS](https://tailwindcss.com/docs/installation/using-vite) - CSS Framework
-- [Tanstack Start](https://tanstack.com/start/latest/docs/framework/solid/overview)
+- [Solid Start](https://docs.solidjs.com/solid-start/getting-started)
 - [TypeScript](https://www.typescriptlang.org/docs/)
-- [Vite](https://vite.dev/guide/)
 
 ## Prerequisites
 
@@ -52,5 +50,5 @@ moon web:build
 moon web:dev
 
 # Serve the built app
-moon web:preview
+moon web:start
 ```

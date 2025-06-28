@@ -1,13 +1,13 @@
 {
-    "name": "",
-    "description": "",
-    "private": "true",
+    "name": "friendet",
     "devDependencies": {
         "@biomejs/biome": "2.0.6",
         "@moonrepo/cli": "^1.38.0",
         "@types/bun": "^1.2.17",
         "typescript": "^5.8.3"
     },
+    "description": "Monorepo for Friendet.",
+    "private": "true",
     "trustedDependencies": [
         "@moonrepo/cli"
     ],
@@ -26,5 +26,10 @@
                 "vite-tsconfig-paths": "^5.1.4"
             }
         }
+    },
+    "dependencies": {
+        "@tailwindcss/vite": "^4.1.11",
+        "openai": "^5.8.2",
+        "tailwindcss": "^4.1.11"
     }
 }
