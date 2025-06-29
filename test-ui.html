@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Relationship Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #6366f1 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #10b981 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #10b981, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .status-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.error {
+            background: var(--error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+
+        .status-indicator.loading {
+            background: var(--warning);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+        
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .panel-header {
+            background: linear-gradient(135deg, var(--surface-light), var(--surface));
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        
+        .chat-container {
+            height: 500px;
+            padding: 1.5rem;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            animation: messageSlide 0.3s ease-out;
+        }
+        
+        .user-message {
+            text-align: right;
+        }
+
+        .user-message .message-bubble {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            margin-left: auto;
+            max-width: 80%;
+        }
+        
+        .ai-message .message-bubble {
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            max-width: 90%;
+        }
+
+        .message-bubble {
+            padding: 1rem 1.5rem;
+            border-radius: 1.25rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-bubble strong {
+            color: var(--accent-color);
+        }
+        
+        .input-section {
+            padding: 1.5rem 2rem;
+            background: var(--surface-light);
+            border-top: 1px solid var(--border);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .message-input {
+            flex: 1;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+        
+        .message-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .quick-btn {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .quick-btn:hover {
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .data-display {
+            height: 500px;
+            padding: 1.5rem;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .data-display::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .data-display::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        .data-display::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        .person-card {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .person-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .person-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .person-details {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .person-details strong {
+            color: var(--text-primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            opacity: 0.5;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .panel-header {
+                padding: 1rem 1.5rem;
+            }
+
+            .chat-container,
+            .data-display {
+                height: 400px;
+                padding: 1rem;
+            }
+
+            .input-section {
+                padding: 1rem 1.5rem;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>AI Relationship Manager</h1>
+            <p>Intelligent personal relationship database powered by Neo4j and AI</p>
+        </div>
+        
+        <div id="status" class="status-bar">
+            <div class="status-indicator loading"></div>
+            <span>Connecting to services...</span>
+        </div>
+        
+        <div class="main-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        AI Assistant
+                    </h2>
+                </div>
+                
+                <div id="chatContainer" class="chat-container">
+                    <div class="message ai-message">
+                        <div class="message-bubble">
+                            👋 <strong>Welcome!</strong> I'm your AI relationship manager. I can help you:
+                            <br><br>
+                            • <strong>Find people</strong> - "What is Alice's info?"
+                            <br>
+                            • <strong>Add contacts</strong> - "I met John, he's 30 and works as a teacher"
+                            <br>
+                            • <strong>Analyze interests</strong> - "Who has similar interests?"
+                            <br>
+                            • <strong>Search database</strong> - "Find all engineers"
+                            <br><br>
+                            Try one of the quick actions below or just start typing! ✨
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-section">
+                    <div class="input-group">
+                        <textarea 
+                            id="messageInput" 
+                            class="message-input" 
+                            placeholder="Ask me about your contacts, add new people, or analyze relationships..."
+                            disabled
+                            rows="1"
+                        ></textarea>
+                        <button id="sendBtn" class="send-btn" disabled>
+                            <span class="btn-text">Send</span>
+                        </button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="sendQuickMessage('Show me all people in my database')">
+                            👥 All People
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Who has similar interests?')">
+                            🔗 Find Interests
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Find all engineers')">
+                            💻 Find Engineers
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('What is Alice birthday?')">
+                            🎂 Alice Birthday
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        Database Overview
+                    </h2>
+                </div>
+                
+                <div id="dataDisplay" class="data-display">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        &nbsp;&nbsp;Loading database information...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AITestInterface {
+            constructor() {
+                this.conversationHistory = [];
+                this.isConnected = false;
+                this.init();
+            }
+            
+            async init() {
+                this.setupEventListeners();
+                await this.checkConnection();
+                if (this.isConnected) {
+                    await this.loadInitialData();
+                }
+            }
+            
+            setupEventListeners() {
+                const messageInput = document.getElementById('messageInput');
+                const sendBtn = document.getElementById('sendBtn');
+                
+                sendBtn.addEventListener('click', () => this.sendMessage());
+                
+                messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                messageInput.addEventListener('input', (e) => {
+                    // Auto-resize textarea
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                });
+            }
+            
+            async checkConnection() {
+                try {
+                    const response = await fetch('/api/health-check', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        this.isConnected = true;
+                        this.updateStatus('✅ Connected to AI and Neo4j', 'connected');
+                        document.getElementById('messageInput').disabled = false;
+                        document.getElementById('sendBtn').disabled = false;
+                    } else {
+                        throw new Error('Service unavailable');
+                    }
+                } catch (error) {
+                    this.updateStatus('⚠️ Connection failed - Demo mode active', 'error');
+                    this.setupDemoMode();
+                }
+            }
+            
+            updateStatus(message, type) {
+                const status = document.getElementById('status');
+                const indicator = status.querySelector('.status-indicator');
+                const text = status.querySelector('span');
+                
+                text.textContent = message;
+                indicator.className = `status-indicator ${type}`;
+            }
+            
+            async sendMessage() {
+                const input = document.getElementById('messageInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                this.addMessageToChat(message, 'user');
+                input.value = '';
+                input.style.height = 'auto';
+                
+                const sendBtn = document.getElementById('sendBtn');
+                const btnText = sendBtn.querySelector('.btn-text');
+                const originalText = btnText.textContent;
+                
+                sendBtn.disabled = true;
+                btnText.textContent = '';
+                sendBtn.appendChild(this.createLoadingSpinner());
+                
+                try {
+                    if (this.isConnected) {
+                        await this.sendToAI(message);
+                    } else {
+                        this.handleDemoMessage(message);
+                    }
+                } catch (error) {
+                    this.addMessageToChat('❌ Sorry, there was an error processing your message.', 'ai');
+                } finally {
+                    sendBtn.disabled = false;
+                    sendBtn.querySelector('.loading-spinner')?.remove();
+                    btnText.textContent = originalText;
+                }
+            }
+
+            createLoadingSpinner() {
+                const spinner = document.createElement('div');
+                spinner.className = 'loading-spinner';
+                return spinner;
+            }
+            
+            async sendToAI(message) {
+                try {
+                    const response = await fetch('/api/ai-chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            message,
+                            conversationHistory: this.conversationHistory 
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        this.addMessageToChat(`❌ Error: ${data.error}`, 'ai');
+                    } else {
+                        this.addMessageToChat(data.message, 'ai');
+                        this.conversationHistory = data.conversationHistory || [];
+                        await this.refreshData();
+                    }
+                } catch (error) {
+                    this.addMessageToChat('❌ Failed to communicate with AI service.', 'ai');
+                }
+            }
+            
+            addMessageToChat(message, sender) {
+                const chatContainer = document.getElementById('chatContainer');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                bubble.innerHTML = this.formatMessage(message);
+                
+                messageDiv.appendChild(bubble);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            formatMessage(message) {
+                // Convert markdown-style formatting to HTML
+                return message
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
+            }
+            
+            async loadInitialData() {
+                await this.refreshData();
+            }
+            
+            async refreshData() {
+                const dataDisplay = document.getElementById('dataDisplay');
+                dataDisplay.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div>&nbsp;&nbsp;Loading...</div>';
+                
+                try {
+                    if (this.isConnected) {
+                        const response = await fetch('/api/get-people', {
+                            method: 'GET',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        
+                        const data = await response.json();
+                        this.displayPeopleData(data.people || []);
+                    } else {
+                        this.displayDemoData();
+                    }
+                } catch (error) {
+                    dataDisplay.innerHTML = '<div class="empty-state">❌ Failed to load data</div>';
+                }
+            }
+            
+            displayPeopleData(people) {
+                const dataDisplay = document.getElementById('dataDisplay');
+                
+                if (people.length === 0) {
+                    dataDisplay.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <h3>No People Found</h3>
+                            <p>Your database is empty. Try adding some people!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Create stats
+                const stats = this.calculateStats(people);
+                
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number">${people.length}</span>
+                            <div class="stat-label">Total People</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">${stats.withOccupations}</span>
+                            <div class="stat-label">With Jobs</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">${stats.withLocations}</span>
+                            <div class="stat-label">With Locations</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">${stats.withBirthdays}</span>
+                            <div class="stat-label">With Birthdays</div>
+                        </div>
+                    </div>
+                `;
+                
+                people.forEach(person => {
+                    html += `
+                        <div class="person-card">
+                            <div class="person-name">
+                                👤 ${person.name}
+                            </div>
+                            <div class="person-details">
+                                ${person.age ? `<strong>Age:</strong> ${person.age}<br>` : ''}
+                                ${person.occupation ? `<strong>Job:</strong> ${person.occupation}<br>` : ''}
+                                ${person.location ? `<strong>Location:</strong> ${person.location}<br>` : ''}
+                                ${person.info ? `<strong>Info:</strong> ${person.info}<br>` : ''}
+                                ${person.birthday && person.birthday !== '[object Object]' ? `<strong>Birthday:</strong> ${this.formatBirthday(person.birthday)}<br>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                dataDisplay.innerHTML = html;
+            }
+
+            formatBirthday(birthday) {
+                if (typeof birthday === 'object' && birthday.year) {
+                    const year = birthday.year.low || birthday.year;
+                    const month = birthday.month.low || birthday.month;
+                    const day = birthday.day.low || birthday.day;
+                    return `${month}/${day}/${year}`;
+                }
+                return birthday;
+            }
+
+            calculateStats(people) {
+                return {
+                    withOccupations: people.filter(p => p.occupation && p.occupation !== 'null').length,
+                    withLocations: people.filter(p => p.location && p.location !== 'null').length,
+                    withBirthdays: people.filter(p => p.birthday && p.birthday !== '[object Object]').length
+                };
+            }
+            
+            setupDemoMode() {
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                this.displayDemoData();
+            }
+            
+            displayDemoData() {
+                const demoData = [
+                    { name: 'Sarah Johnson', age: 28, occupation: 'Software Engineer', location: 'San Francisco', info: 'Loves hiking and photography' },
+                    { name: 'Michael Chen', age: 32, occupation: 'Data Scientist', location: 'Mountain View' },
+                    { name: 'Alice', birthday: '1990-01-01', info: 'Graph theory enthusiast' }
+                ];
+                this.displayPeopleData(demoData);
+            }
+            
+            handleDemoMessage(message) {
+                const responses = [
+                    "🤖 <strong>Demo Mode:</strong> In a real setup, I would process your message and interact with Neo4j to manage your relationship database.",
+                    "📊 <strong>Demo Mode:</strong> I would extract person details from your message and store them in the graph database.",
+                    "🔍 <strong>Demo Mode:</strong> I would search through your Neo4j database to find relevant people and relationships."
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                setTimeout(() => {
+                    this.addMessageToChat(randomResponse, 'ai');
+                }, 1000);
+            }
+        }
+        
+        function sendQuickMessage(message) {
+            document.getElementById('messageInput').value = message;
+            window.aiInterface.sendMessage();
+        }
+        
+        // Initialize the interface when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            window.aiInterface = new AITestInterface();
+        });
+    </script>
+</body>
+</html> 

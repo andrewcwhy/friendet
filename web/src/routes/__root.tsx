@@ -67,15 +67,7 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
           }}
           activeOptions={{ exact: true }}
         >
-          Home
-        </Link>{' '}
-        <Link
-          to="/posts"
-          activeProps={{
-            class: 'font-bold',
-          }}
-        >
-          Posts
+          AI Assistant
         </Link>{' '}
         <Link
           to="/users"
@@ -83,32 +75,7 @@ function RootDocument({ children }: { children: Solid.JSX.Element }) {
             class: 'font-bold',
           }}
         >
-          Users
-        </Link>{' '}
-        <Link
-          to="/route-a"
-          activeProps={{
-            class: 'font-bold',
-          }}
-        >
-          Pathless Layout
-        </Link>{' '}
-        <Link
-          to="/deferred"
-          activeProps={{
-            class: 'font-bold',
-          }}
-        >
-          Deferred
-        </Link>{' '}
-        <Link
-          // @ts-expect-error
-          to="/this-route-does-not-exist"
-          activeProps={{
-            class: 'font-bold',
-          }}
-        >
-          This Route Does Not Exist
+          People
         </Link>
       </div>
       <hr />
